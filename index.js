@@ -65,10 +65,44 @@ function app(state = {}, action) {
   };
 }
 
+
+
+// Optional Middleware
+
+function checkAndDispatch(store, action) {
+   if (
+     action.type === ADD_TODO &&
+     action.todo.name.toLowerCase().includes("bitcoin")
+   ) {
+     return alert("Nope. That's a bad idea.");
+   }
+
+   if (
+     action.type === ADD_GOAL &&
+     action.goal.name.toLowerCase().includes("bitcoin")
+   ) {
+     return alert("Nope. That's a bad idea.");
+   }
+
+   return store.dispatch(action);
+}
+
+
+const logger = (store) => (next) => (action) => {
+  console.group(action.type);
+  console.log("The action: ", action);
+  const result = next(action);
+  console.log("The new state: ", store.getState());
+  console.groupEnd();
+  return result;
+};
+
+
 // We pass the root reducer to our store because
 // the createStore() function can only take in one reducer.
 
 // redux: Redux.createStore(Redux.combineReducers({todos,goals}))
+// redux with middleware: Redux.createStore(Redux.combineReducers({todos,goals}), Redux.applyMiddleware(checker, logger))
 const store = createStore(app); //pass reducer function
 
 store.subscribe(() => {
@@ -83,6 +117,7 @@ store.dispatch({
     complete: false,
   },
 });
+// checkAndDispatch(store, {type.....);
 
 store.dispatch({
   type: "ADD_TODO",
